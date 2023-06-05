@@ -13,10 +13,21 @@ class AdminController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index() {
-        $admins = Admin::all();
+    public function index(Request $request) {
+        $search = $request->query('search');
+    
+        if ($search) {
+            $admins = Admin::where('name', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%")
+                ->paginate(10);
+        } else {
+            $admins = Admin::paginate(10); // Vai retornar 10 admins por página
+        }
+        
         return response()->json($admins);
     }
+    
+    
 
     /**
      * Cria um novo recurso do tipo Admin.

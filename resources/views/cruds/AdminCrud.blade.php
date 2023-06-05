@@ -22,8 +22,9 @@
 						<h2>Manage <b>Admins</b></h2>
 					</div>
 					<div class="col-sm-6">
+						<input type="text" id="searchAdmin" placeholder="Search for admins">
 						<a href="#addAdminModal" class="btn btn-success" data-toggle="modal"><i class="material-icons">&#xE147;</i> <span>Add New Admin</span></a>
-						<a href="#deleteAdminModal" class="btn btn-danger" data-toggle="modal"><i class="material-icons">&#xE15C;</i> <span>Delete</span></a>						
+						<a id="deleteSelectedAdmins" class="btn btn-danger" data-toggle="modal"><i class="material-icons">&#xE15C;</i> <span>Delete</span></a>						
 					</div>
 				</div>
 			</div>
@@ -55,92 +56,69 @@
 			</div>
 		</div>
 	</div>        
-</div>
-<!-- Edit Modal HTML -->
-<div id="addAdminModal" class="modal fade">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<form>
-				<div class="modal-header">						
-					<h4 class="modal-title">Add Admin</h4>
-					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-				</div>
-				<div class="modal-body">					
-					<div class="form-group">
-						<label>Name</label>
-						<input type="text" id="name" class="form-control" required>
+	<!-- Edit Modal HTML -->
+	<div id="addAdminModal" class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+					<div class="modal-header">						
+						<h4 class="modal-title">Add Admin</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 					</div>
-					<div class="form-group">
-						<label>Email</label>
-						<input type="email" id="email" class="form-control" required>
+				<form id="adminRegisterForm">
+					<div class="modal-body">					
+						<div class="form-group">
+							<label>Name</label>
+							<input type="text" id="name" class="form-control" required>
+						</div>
+						<div class="form-group">
+							<label>Email</label>
+							<input type="email" id="email" class="form-control" required>
+						</div>
+						<div class="form-group">
+							<label>Password</label>
+							<input type="password" id="password" class="form-control" required>
+						</div>					
 					</div>
-					<div class="form-group">
-						<label>Password</label>
-						<input type="password" id="password" class="form-control" required>
-					</div>					
-				</div>
-				<div class="modal-footer">
-					<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-					<input type="submit"  id="submitButtonAdminRegister" class="btn btn-success" value="Add">
-				</div>
-			</form>
+					<div class="modal-footer">
+						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+						<input type="submit" id="submitButtonAdminRegister" class="btn btn-success" value="Add">
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<!-- Edit Modal HTML -->
+	<div id="editAdminModal" class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form id="adminUpdateForm">
+					<div class="modal-header">						
+						<h4 class="modal-title">Edit Admin</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					</div>
+					<div class="modal-body">					
+						<div class="form-group">
+							<label>Name</label>
+							<input type="text" id="edit-name" class="form-control" required>
+						</div>
+						<div class="form-group">
+							<label>Email</label>
+							<input type="email" id="edit-email" class="form-control" required>
+						</div>
+						<div class="form-group">
+							<label>Password</label>
+							<input type="password" id="edit-password" class="form-control" required>
+						</div>					
+					</div>
+					<div class="modal-footer">
+						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+						<input type="submit" id="submitButtonAdminUpdate" class="btn btn-info" value="Save">
+					</div>
+				</form>
+			</div>
 		</div>
 	</div>
 </div>
-<!-- Edit Modal HTML -->
-<div id="editAdminModal" class="modal fade">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<form id="editAdminForm">
-				<div class="modal-header">						
-					<h4 class="modal-title">Edit Admin</h4>
-					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-				</div>
-				<div class="modal-body">					
-					<div class="form-group">
-						<label>Name</label>
-						<input type="text" id="name" class="form-control" required>
-					</div>
-					<div class="form-group">
-						<label>Email</label>
-						<input type="email" id="email" class="form-control" required>
-					</div>
-					<div class="form-group">
-						<label>Password</label>
-						<input type="password" id="password" class="form-control" required>
-					</div>					
-				</div>
-				<div class="modal-footer">
-					<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-					<input type="submit" id="submitButtonAdminUpdate" class="btn btn-info" value="Save">
-				</div>
-			</form>
-		</div>
-	</div>
-</div>
-
-<!-- Delete Modal HTML -->
-<div id="deleteAdminModal" class="modal fade">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<form>
-				<div class="modal-header">						
-					<h4 class="modal-title">Delete Admin</h4>
-					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-				</div>
-				<div class="modal-body">					
-					<p>Are you sure you want to delete these Records?</p>
-					<p class="text-warning"><small>This action cannot be undone.</small></p>
-				</div>
-				<div class="modal-footer">
-					<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-					<input type="submit" class="btn btn-danger" value="Delete">
-				</div>
-			</form>
-		</div>
-	</div>
-</div>
-
 @endsection
 
 

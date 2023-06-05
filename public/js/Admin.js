@@ -4,8 +4,14 @@ const apiUrl = '/api/admin';
 document.addEventListener("DOMContentLoaded", function() {
     $('#submitButtonAdminRegister').on('click', registerAdmin);
     $('#submitButtonAdminUpdate').on('click', updateAdmin);
+    $('#deleteSelectedAdmins').on('click', deleteSelectedAdmins);
+    $('#searchAdmin').on('input', searchAdmins);
+    
+    $(document).on('click', '.edit', function() {
+        adminId = $(this).data('id');
+    });
     getAllAdmins();
-});
+})
 
 function registerAdmin(e) {
     e.preventDefault();
@@ -25,17 +31,68 @@ function updateAdmin(e) {
     }, 'Admin atualizado com sucesso!', () => $('#editAdminModal').modal('hide'));
 }
 
+function deleteSelectedAdmins() {
+    // Obtém todos os checkboxes
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+    
+    // Para cada checkbox marcado, faz uma solicitação para deletar o usuário correspondente
+    checkboxes.forEach(checkbox => {
+        const adminId = checkbox.value;
+        deleteAdminById(adminId);
+    });
+}
+
+function searchAdmins() {
+    const searchTerm = $('#searchAdmin').val();
+
+    // Aqui você faz uma requisição AJAX para o servidor com o termo de pesquisa.
+    ajaxRequest(`${apiUrl}?search=${searchTerm}`, 'GET', null, null, function(response) {
+        const tbody = $('#admin-table-body');
+        tbody.empty();
+        response.data.forEach(admin => tbody.append(createAdminRow(admin)));
+        
+        // Atualiza a paginação de acordo com os novos resultados.
+        updatePagination(response);
+    });
+}
+
 function getAdminById(id) {
     ajaxRequest(`${apiUrl}/${id}`, 'GET', null, 'Admin obtido com sucesso!');
 }
 
-function getAllAdmins() {
-    ajaxRequest(apiUrl, 'GET', null, null, function(data) {
+function getAllAdmins(page = 1, search = '') {
+    let url = `${apiUrl}?page=${page}`;
+    if (search) {
+        url += `&search=${search}`;
+    }
+    ajaxRequest(url, 'GET', null, null, function(response) {
         const tbody = $('#admin-table-body');
         tbody.empty();
-        data.forEach(admin => tbody.append(createAdminRow(admin)));
+        response.data.forEach(admin => tbody.append(createAdminRow(admin)));
+
+        const currentPage = response.current_page;  // A página atual
+        const lastPage = response.last_page;  // O número total de páginas
+        const nextPag = currentPage < lastPage ? currentPage + 1 : currentPage; // Define a próxima página
+
+        // atualiza o texto com o total de registros e a página atual
+        $('.hint-text').html(`Showing <b>${currentPage}</b>-<b>${nextPag}</b> out of <b>${lastPage}</b> entries`);
+
+        // atualiza os links da paginação
+        const pagination = $('.pagination');
+        pagination.empty();
+        if (!response.prev_page_url) {
+            pagination.append('<li class="page-item disabled"><a href="#">Previous</a></li>');
+        } else {
+            pagination.append(`<li class="page-item"><a href="#" class="page-link" onclick="getAllAdmins(${response.current_page - 1})">Previous</a></li>`);
+        }
+        if (!response.next_page_url) {
+            pagination.append('<li class="page-item disabled"><a href="#">Next</a></li>');
+        } else {
+            pagination.append(`<li class="page-item"><a href="#" class="page-link" onclick="getAllAdmins(${response.current_page + 1})">Next</a></li>`);
+        }
     });
 }
+
 
 function createAdminRow(admin) {
     return `
@@ -49,7 +106,7 @@ function createAdminRow(admin) {
             <td>${admin.name}</td>
             <td>${admin.email}</td>
             <td>
-                <a href="#editAdminModal" class="edit" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
+                <a href="#editAdminModal" class="edit" data-toggle="modal" data-id="${admin.id}"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
                 <a href="#" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete" onclick="deleteAdminById(${admin.id})" >&#xE872;</i></a>
             </td>
         </tr>
@@ -74,6 +131,7 @@ function ajaxRequest(url, method, data, successMessage, onSuccess) {
             }
         },
         error: function(jqXHR, textStatus) {
+            console.log(jqXHR.responseText);  // Verifique esta mensagem no console do navegador
             alert('Erro: ' + textStatus);
         }
     });
