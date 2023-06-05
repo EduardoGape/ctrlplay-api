@@ -14,5 +14,20 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('Home');
+});
+Route::get('/rank', function () {
+    return view('Rank');
+});
+
+Route::prefix('admin')->group(function () {
+    Route::get('/', function () {
+        return view('Admin');
+    });
+    Route::get('/crudadmin', function () {
+        return view('cruds.AdminCrud');
+    });
+    Route::get('/crudstudent', function () {
+        return view('cruds.StudentCrud');
+    });
 });
