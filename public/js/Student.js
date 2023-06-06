@@ -1,74 +1,78 @@
-let adminId;
-const apiUrl = '/api/admin';
+let studentId;
+const apiUrl = '/api/student';
 
 document.addEventListener("DOMContentLoaded", function() {
-    $('#submitButtonAdminRegister').on('click', registerAdmin);
-    $('#submitButtonAdminUpdate').on('click', updateAdmin);
-    $('#deleteSelectedAdmins').on('click', deleteSelectedAdmins);
-    $('#searchAdmin').on('input', searchAdmins);
+    $('#submitButtonStudentRegister').on('click', registerStudent);
+    $('#submitButtonStudentUpdate').on('click', updateStudent);
+    $('#deleteSelectedStudents').on('click', deleteSelectedStudents);
+    $('#searchStudent').on('input', searchStudents);
     
     $(document).on('click', '.edit', function() {
-        adminId = $(this).data('id');
+        studentId = $(this).data('id');
     });
-    getAllAdmins();
+    getAllStudents();
 })
 
-function registerAdmin(e) {
+function registerStudent(e) {
     e.preventDefault();
     ajaxRequest(apiUrl, 'POST', { 
         name: $('#name').val(),
         email: $('#email').val(),
+        age: $('#age').val(),
+        ctrlCash: $('#ctrlCash').val(),
         password: $('#password').val()
-    }, 'Admin cadastrado com sucesso!', () => $('#addAdminModal').modal('hide'));
+    }, 'Estudante cadastrado com sucesso!', () => $('#addStudentModal').modal('hide'));
 }
 
-function updateAdmin(e) {
+function updateStudent(e) {
     e.preventDefault();
-    ajaxRequest(`${apiUrl}/${adminId}`, 'PUT', {
+    ajaxRequest(`${apiUrl}/${studentId}`, 'PUT', {
         name: $('#edit-name').val(),
         email: $('#edit-email').val(),
+        age: $('#edit-age').val(),
+        ctrlCash: $('#edit-ctrlCash').val(),
         password: $('#edit-password').val()
-    }, 'Admin atualizado com sucesso!', () => $('#editAdminModal').modal('hide'));
+    }, 'Estudante atualizado com sucesso!', () => $('#editStudentModal').modal('hide'));
 }
 
-function deleteSelectedAdmins() {
+function deleteSelectedStudents() {
     // Obtém todos os checkboxes
     const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
     
     // Para cada checkbox marcado, faz uma solicitação para deletar o usuário correspondente
     checkboxes.forEach(checkbox => {
-        const adminId = checkbox.value;
-        deleteAdminById(adminId);
+        const studentId = checkbox.value;
+        deleteStudentById(studentId);
     });
 }
 
-function searchAdmins() {
-    const searchTerm = $('#searchAdmin').val();
+function searchStudents() {
+    const searchTerm = $('#searchStudent').val();
 
     // Aqui você faz uma requisição AJAX para o servidor com o termo de pesquisa.
     ajaxRequest(`${apiUrl}?search=${searchTerm}`, 'GET', null, null, function(response) {
-        const tbody = $('#admin-table-body');
+        const tbody = $('#student-table-body');
         tbody.empty();
-        response.data.forEach(admin => tbody.append(createAdminRow(admin)));
+        response.data.forEach(student => tbody.append(createStudentRow(student)));
         
         // Atualiza a paginação de acordo com os novos resultados.
         updatePagination(response);
     });
 }
 
-function getAdminById(id) {
-    ajaxRequest(`${apiUrl}/${id}`, 'GET', null, 'Admin obtido com sucesso!');
+function getStudentById(id) {
+    ajaxRequest(`${apiUrl}/${id}`, 'GET', null, 'Student obtido com sucesso!');
 }
 
-function getAllAdmins(page = 1, search = '') {
+function getAllStudents(page = 1, search = '') {
     let url = `${apiUrl}?page=${page}`;
     if (search) {
         url += `&search=${search}`;
     }
     ajaxRequest(url, 'GET', null, null, function(response) {
-        const tbody = $('#admin-table-body');
+        const tbody = $('#student-table-body');
         tbody.empty();
-        response.data.forEach(admin => tbody.append(createAdminRow(admin)));
+        response.data.forEach(student => tbody.append(createStudentRow(student)));
 
         const currentPage = response.current_page;  // A página atual
         const lastPage = response.last_page;  // O número total de páginas
@@ -83,38 +87,43 @@ function getAllAdmins(page = 1, search = '') {
         if (!response.prev_page_url) {
             pagination.append('<li class="page-item disabled"><a href="#">Previous</a></li>');
         } else {
-            pagination.append(`<li class="page-item"><a href="#" class="page-link" onclick="getAllAdmins(${response.current_page - 1})">Previous</a></li>`);
+            pagination.append(`<li class="page-item"><a href="#" class="page-link" onclick="getAllstudents(${response.current_page - 1})">Previous</a></li>`);
         }
         if (!response.next_page_url) {
             pagination.append('<li class="page-item disabled"><a href="#">Next</a></li>');
         } else {
-            pagination.append(`<li class="page-item"><a href="#" class="page-link" onclick="getAllAdmins(${response.current_page + 1})">Next</a></li>`);
+            pagination.append(`<li class="page-item"><a href="#" class="page-link" onclick="getAllstudents(${response.current_page + 1})">Next</a></li>`);
         }
     });
 }
 
 
-function createAdminRow(admin) {
+function createStudentRow(student) {
+    let ageDate = new Date(student.age);
+    let formattedAge = `${ageDate.getUTCFullYear()}-${String(ageDate.getUTCMonth() + 1).padStart(2, '0')}-${String(ageDate.getUTCDate()).padStart(2, '0')}`;
     return `
         <tr>
             <td>
                 <span class="custom-checkbox">
-                    <input type="checkbox" id="checkbox${admin.id}" name="options[]" value="${admin.id}">
-                    <label for="checkbox${admin.id}"></label>
+                    <input type="checkbox" id="checkbox${student.id}" name="options[]" value="${student.id}">
+                    <label for="checkbox${student.id}"></label>
                 </span>
             </td>
-            <td>${admin.name}</td>
-            <td>${admin.email}</td>
+            <td>${student.name}</td>
+            <td>${student.email}</td>
+            <td>${formattedAge}</td>    <!-- Formatted age -->
+            <td>${student.ctrlCash}</td> <!-- Added ctrlCash field -->
             <td>
-                <a href="#editAdminModal" class="edit" data-toggle="modal" data-id="${admin.id}"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
-                <a href="#" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete" onclick="deleteAdminById(${admin.id})" >&#xE872;</i></a>
+                <a href="#editStudentModal" class="edit" data-toggle="modal" data-id="${student.id}"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
+                <a href="#" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete" onclick="deleteStudentById(${student.id})" >&#xE872;</i></a>
             </td>
         </tr>
     `;
 }
 
-function deleteAdminById(id) {
-    ajaxRequest(`${apiUrl}/${id}`, 'DELETE', null, 'Admin deletado com sucesso!');
+
+function deleteStudentById(id) {
+    ajaxRequest(`${apiUrl}/${id}`, 'DELETE', null, 'student deletado com sucesso!');
 }
 
 function ajaxRequest(url, method, data, successMessage, onSuccess) {

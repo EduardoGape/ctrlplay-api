@@ -6,103 +6,106 @@ use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
-
 class StudentController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Mostra todos os recursos do tipo Student.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-        //
+    public function index(Request $request) {
+        $search = $request->query('search');
+    
+        if ($search) {
+            $students = Student::where('name', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%")
+                ->paginate(10);
+        } else {
+            $students = Student::paginate(10); // Vai retornar 10 students por página
+        }
+        
+        return response()->json($students);
     }
+    
+    
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Armazena um novo recurso no banco de dados.
+     * Cria um novo recurso do tipo Student.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        // Validação dos dados de entrada
         $request->validate([
             'name' => 'required|string|max:255',
-            'age' => 'required|date',
             'email' => 'required|string|email|max:255|unique:students',
-            'ctrlCash' => 'nullable|numeric',
             'password' => 'required|string|min:6',
+            'age' => 'required|date',
+            'ctrlCash' => 'required|numeric',
         ]);
-
-        // Criação do estudante
+    
         $student = Student::create([
             'name' => $request->name,
-            'age' => $request->age,
             'email' => $request->email,
-            'ctrlCash' => $request->ctrlCash ?? 0,
-            // A senha deve ser hash antes de ser armazenada
+            'age' => $request->age,
+            'ctrlCash' => $request->ctrlCash,
             'password' => Hash::make($request->password),
         ]);
-
-        // Retorna a resposta com o novo recurso e um código de status 201
+    
         return response()->json($student, 201);
     }
 
 
     /**
-     * Display the specified resource.
+     * Exibe um recurso do tipo Student específico.
      *
-     * @param  \App\Models\Student  $student
+     * @param  \App\Models\Student  $Student
      * @return \Illuminate\Http\Response
      */
     public function show(Student $student)
     {
-        //
+        return response()->json($student);
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Student  $student
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Student $student)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
+     * Atualiza um recurso do tipo Student específico.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Student  $student
+     * @param  \App\Models\Student  $Student
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Student $student)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:students,email,' . $student->id,
+            'password' => 'required|string|min:6',
+            'age' => 'required|date',
+            'ctrlCash' => 'required|numeric',
+        ]);
+
+        $student->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'age' => $request->age,
+            'ctrlCash' => $request->ctrlCash,
+            'password' => Hash::make($request->password),
+        ]);
+
+        return response()->json($student);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove um recurso do tipo Student específico.
      *
-     * @param  \App\Models\Student  $student
+     * @param  \App\Models\Student  $Student
      * @return \Illuminate\Http\Response
      */
     public function destroy(Student $student)
     {
-        //
+        $student->delete();
+
+        return response()->json(null, 204);
     }
 }

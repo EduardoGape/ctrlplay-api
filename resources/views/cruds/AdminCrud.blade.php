@@ -1,5 +1,5 @@
 @extends('base.estructhtml')
-@section('Title', 'Student Crud')
+@section('Title', 'Admin Crud')
 
 @section('Header')
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -120,6 +120,10 @@
 	</div>
 </div>
 @endsection
+
+@push('Script')
+	<script src="/js/Admin.js"></script>
+@endpush
 
 
 
