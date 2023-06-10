@@ -1,78 +1,74 @@
-let studentId;
-const apiUrl = '/api/student';
+let TeacherId;
+const apiUrl = '/api/teacher';
 
 document.addEventListener("DOMContentLoaded", function() {
-    $('#submitButtonStudentRegister').on('click', registerStudent);
-    $('#submitButtonStudentUpdate').on('click', updateStudent);
-    $('#deleteSelectedStudents').on('click', deleteSelectedStudents);
-    $('#searchStudent').on('input', searchStudents);
+    $('#submitButtonTeacherRegister').on('click', registerTeacher);
+    $('#submitButtonTeacherUpdate').on('click', updateTeacher);
+    $('#deleteSelectedTeachers').on('click', deleteSelectedTeachers);
+    $('#searchTeacher').on('input', searchTeachers);
     
     $(document).on('click', '.edit', function() {
-        studentId = $(this).data('id');
+        teacherId = $(this).data('id');
     });
-    getAllStudents();
+    getAllTeachers();
 })
 
-function registerStudent(e) {
+function registerTeacher(e) {
     e.preventDefault();
     ajaxRequest(apiUrl, 'POST', { 
         name: $('#name').val(),
         email: $('#email').val(),
-        age: $('#age').val(),
-        ctrlCash: $('#ctrlCash').val(),
         password: $('#password').val()
-    }, 'Estudante cadastrado com sucesso!', () => $('#addStudentModal').modal('hide'));
+    }, 'Estudante cadastrado com sucesso!', () => $('#addTeacherModal').modal('hide'));
 }
 
-function updateStudent(e) {
+function updateTeacher(e) {
     e.preventDefault();
-    ajaxRequest(`${apiUrl}/${studentId}`, 'PUT', {
+    ajaxRequest(`${apiUrl}/${TeacherId}`, 'PUT', {
         name: $('#edit-name').val(),
         email: $('#edit-email').val(),
-        age: $('#edit-age').val(),
-        ctrlCash: $('#edit-ctrlCash').val(),
         password: $('#edit-password').val()
-    }, 'Estudante atualizado com sucesso!', () => $('#editStudentModal').modal('hide'));
+    }, 'Estudante atualizado com sucesso!', () => $('#editTeacherModal').modal('hide'));
 }
 
-function deleteSelectedStudents() {
+function deleteSelectedTeachers() {
     // Obtém todos os checkboxes
     const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
     
     // Para cada checkbox marcado, faz uma solicitação para deletar o usuário correspondente
     checkboxes.forEach(checkbox => {
-        const studentId = checkbox.value;
-        deleteStudentById(studentId);
+        const teacherId = checkbox.value;
+        deleteTeacherById(teacherId);
     });
 }
 
-function searchStudents() {
-    const searchTerm = $('#searchStudent').val();
+function searchTeachers() {
+    const searchTerm = $('#searchTeacher').val();
 
     // Aqui você faz uma requisição AJAX para o servidor com o termo de pesquisa.
     ajaxRequest(`${apiUrl}?search=${searchTerm}`, 'GET', null, null, function(response) {
-        const tbody = $('#student-table-body');
+        const tbody = $('#Teacher-table-body');
         tbody.empty();
-        response.data.forEach(student => tbody.append(createStudentRow(student)));
+        response.data.forEach(Teacher => tbody.append(createTeacherRow(Teacher)));
         
         // Atualiza a paginação de acordo com os novos resultados.
         updatePagination(response);
     });
 }
 
-function getStudentById(id) {
-    ajaxRequest(`${apiUrl}/${id}`, 'GET', null, 'Student obtido com sucesso!');
+function getTeacherById(id) {
+    ajaxRequest(`${apiUrl}/${id}`, 'GET', null, 'Teacher obtido com sucesso!');
 }
 
-function getAllStudents(page = 1, search = '') {
+function getAllTeachers(page = 1, search = '') {
     let url = `${apiUrl}?page=${page}`;
     if (search) {
         url += `&search=${search}`;
     }
     ajaxRequest(url, 'GET', null, null, function(response) {
-        const tbody = $('#student-table-body');
+        const tbody = $('#Teacher-table-body');
         tbody.empty();
-        response.data.forEach(student => tbody.append(createStudentRow(student)));
+        response.data.forEach(Teacher => tbody.append(createTeacherRow(Teacher)));
 
         const currentPage = response.current_page;  // A página atual
         const lastPage = response.last_page;  // O número total de páginas
@@ -98,31 +94,27 @@ function getAllStudents(page = 1, search = '') {
 }
 
 
-function createStudentRow(student) {
-    let ageDate = new Date(student.age);
-    let formattedAge = `${ageDate.getUTCFullYear()}-${String(ageDate.getUTCMonth() + 1).padStart(2, '0')}-${String(ageDate.getUTCDate()).padStart(2, '0')}`;
+function createTeacherRow(teacher) {
     return `
         <tr>
             <td>
                 <span class="custom-checkbox">
-                    <input type="checkbox" id="checkbox${student.id}" name="options[]" value="${student.id}">
-                    <label for="checkbox${student.id}"></label>
+                    <input type="checkbox" id="checkbox${teacher.id}" name="options[]" value="${teacher.id}">
+                    <label for="checkbox${teacher.id}"></label>
                 </span>
             </td>
-            <td>${student.name}</td>
-            <td>${student.email}</td>
-            <td>${formattedAge}</td>    <!-- Formatted age -->
-            <td>${student.ctrlCash}</td> <!-- Added ctrlCash field -->
+            <td>${teacher.name}</td>
+            <td>${teacher.email}</td>
             <td>
-                <a href="#editStudentModal" class="edit" data-toggle="modal" data-id="${student.id}"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
-                <a href="#" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete" onclick="deleteStudentById(${student.id})" >&#xE872;</i></a>
+                <a href="#editTeacherModal" class="edit" data-toggle="modal" data-id="${teacher.id}"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
+                <a href="#" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete" onclick="deleteTeacherById(${teacher.id})" >&#xE872;</i></a>
             </td>
         </tr>
     `;
 }
 
-function deleteStudentById(id) {
-    ajaxRequest(`${apiUrl}/${id}`, 'DELETE', null, 'student deletado com sucesso!');
+function deleteTeacherById(id) {
+    ajaxRequest(`${apiUrl}/${id}`, 'DELETE', null, 'Teacher deletado com sucesso!');
 }
 
 function ajaxRequest(url, method, data, successMessage, onSuccess) {

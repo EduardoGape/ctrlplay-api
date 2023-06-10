@@ -14,19 +14,21 @@ class StudentController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request) {
+        $orderBy = $request->query('orderBy', 'ctrlCash');
+        $direction = $request->query('direction', 'desc');
         $search = $request->query('search');
-    
+        
+        $query = Student::orderBy($orderBy, $direction);
+        
         if ($search) {
-            $students = Student::where('name', 'like', "%{$search}%")
-                ->orWhere('email', 'like', "%{$search}%")
-                ->paginate(10);
-        } else {
-            $students = Student::paginate(10); // Vai retornar 10 students por página
+            $query->where('name', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%");
         }
         
+        $students = $query->paginate(10);
+            
         return response()->json($students);
     }
-    
     
 
     /**

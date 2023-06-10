@@ -6,99 +6,97 @@ use App\Models\Teacher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
-
 class TeacherController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Mostra todos os recursos do tipo Teacher.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-        //
+    public function index(Request $request) {
+        $search = $request->query('search');
+    
+        if ($search) {
+            $Teachers = Teacher::where('name', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%")
+                ->paginate(10);
+        } else {
+            $Teachers = Teacher::paginate(10); // Vai retornar 10 Teachers por página
+        }
+        
+        return response()->json($Teachers);
     }
+    
+    
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-        /**
-     * Armazena um novo recurso no banco de dados.
+     * Cria um novo recurso do tipo Teacher.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        // Validação dos dados de entrada
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:teachers',
+            'email' => 'required|string|email|max:255',
             'password' => 'required|string|min:6',
         ]);
 
-        // Criação do estudante
-        $teacher = Teacher::create([
+        $Teacher = Teacher::create([
             'name' => $request->name,
             'email' => $request->email,
-            // A senha deve ser hash antes de ser armazenada
             'password' => Hash::make($request->password),
         ]);
 
-        // Retorna a resposta com o novo recurso e um código de status 201
-        return response()->json($teacher, 201);
+        return response()->json($Teacher, 201);
     }
 
-
     /**
-     * Display the specified resource.
+     * Exibe um recurso do tipo Teacher específico.
      *
-     * @param  \App\Models\Teacher  $teacher
+     * @param  \App\Models\Teacher  $Teacher
      * @return \Illuminate\Http\Response
      */
-    public function show(Teacher $teacher)
+    public function show(Teacher $Teacher)
     {
-        //
+        return response()->json($Teacher);
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Teacher  $teacher
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Teacher $teacher)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
+     * Atualiza um recurso do tipo Teacher específico.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Teacher  $teacher
+     * @param  \App\Models\Teacher  $Teacher
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Teacher $teacher)
+    public function update(Request $request, Teacher $Teacher)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:teachers,email,'.$Teacher->id,
+            'password' => 'required|string|min:6',
+        ]);
+
+        $Teacher->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+
+        return response()->json($Teacher);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove um recurso do tipo Teacher específico.
      *
-     * @param  \App\Models\Teacher  $teacher
+     * @param  \App\Models\Teacher  $Teacher
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Teacher $teacher)
+    public function destroy(Teacher $Teacher)
     {
-        //
+        $Teacher->delete();
+
+        return response()->json(null, 204);
     }
 }

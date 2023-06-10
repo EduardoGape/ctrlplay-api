@@ -10,10 +10,16 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="#student">Student</a>
+                    <a class="nav-link" href="http://191.252.214.61:8040/admin/Classes">Turmas</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#admin">Admin</a>
+                    <a class="nav-link" href="http://191.252.214.61:8040/admin/crudteacher">Teacher</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="http://191.252.214.61:8040/admin/crudstudent">Student</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="http://191.252.214.61:8040/admin/crudstudent">Admin</a>
                 </li>
             </ul>
         </div>

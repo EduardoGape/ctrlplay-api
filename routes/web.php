@@ -30,4 +30,7 @@ Route::prefix('admin')->group(function () {
     Route::get('/crudstudent', function () {
         return view('cruds.StudentCrud');
     });
+    Route::get('/crudteacher', function () {
+        return view('cruds.TeacherCrud');
+    });
 });

@@ -13,7 +13,7 @@
                     <a class="nav-link" href="http://191.252.214.61:8040/rank">Rank</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="http://191.252.214.61:8040/Administrativo">Administrativo</a>
+                    <a class="nav-link" href="http://191.252.214.61:8040/admin">Admin</a>
                 </li>
             </ul>
         </div>
