@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Classe;
 
 class Student extends Model
 {
@@ -42,4 +43,9 @@ class Student extends Model
     protected $casts = [
         'age' => 'datetime',
     ];
+
+    public function classes()
+{
+    return $this->belongsToMany(Classe::class, 'student_classe');
+}
 }
